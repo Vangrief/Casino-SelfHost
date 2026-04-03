@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from 'framer-motion';
 import type { BlackjackPlayerHand } from '@casino/shared';
 import { PlayingCard } from './PlayingCard';
 
@@ -10,11 +11,24 @@ export function Hand({ hand, isActive = false }: HandProps) {
   return (
     <div className={`flex flex-col items-center gap-1 ${isActive ? 'ring-2 ring-casino-gold rounded-xl p-2' : 'p-2'}`}>
       <div className="flex -space-x-6">
-        {hand.cards.map((card, i) => (
-          <PlayingCard key={i} card={card} className={i > 0 ? 'relative' : ''} />
-        ))}
+        <AnimatePresence mode="popLayout">
+          {hand.cards.map((card, i) => (
+            <PlayingCard
+              key={i}
+              card={card}
+              dealDelay={i}
+              animateDeal={true}
+              className={i > 0 ? 'relative' : ''}
+            />
+          ))}
+        </AnimatePresence>
       </div>
-      <div className="flex items-center gap-2 mt-1">
+      <motion.div
+        className="flex items-center gap-2 mt-1"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
         <span
           className={`text-sm font-bold ${
             hand.isBusted
@@ -31,7 +45,7 @@ export function Hand({ hand, isActive = false }: HandProps) {
             {hand.bet.toLocaleString()}
           </span>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

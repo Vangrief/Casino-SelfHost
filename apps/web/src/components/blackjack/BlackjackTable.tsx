@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from 'framer-motion';
 import type { BlackjackClientState } from '@casino/shared';
 import { useAuthStore } from '../../stores/auth.store';
 import { DealerHand } from './DealerHand';
@@ -109,41 +110,71 @@ export function BlackjackTable({
       </div>
 
       {/* Controls */}
+      <AnimatePresence mode="wait">
       {state.phase === 'bj:betting' && !hasBet && (
-        <BetControls
-          minBet={minBet}
-          maxBet={maxBet}
-          balance={balance}
-          onPlaceBet={onPlaceBet}
-        />
+        <motion.div
+          key="bet-controls"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          <BetControls
+            minBet={minBet}
+            maxBet={maxBet}
+            balance={balance}
+            onPlaceBet={onPlaceBet}
+          />
+        </motion.div>
       )}
 
       {state.phase === 'bj:betting' && hasBet && (
-        <div className="text-casino-gold font-medium">Warte auf andere Spieler...</div>
+        <motion.div key="waiting" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <div className="text-casino-gold font-medium">Warte auf andere Spieler...</div>
+        </motion.div>
       )}
 
       {state.phase === 'bj:player_turn' && isMyTurn && (
-        <ActionButtons
-          canHit={canHit}
-          canStand={canStand}
-          canDouble={canDouble}
-          canSplit={canSplit}
-          onHit={onHit}
-          onStand={onStand}
-          onDouble={onDouble}
-          onSplit={onSplit}
-        />
+        <motion.div
+          key="actions"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.25 }}
+        >
+          <ActionButtons
+            canHit={canHit}
+            canStand={canStand}
+            canDouble={canDouble}
+            canSplit={canSplit}
+            onHit={onHit}
+            onStand={onStand}
+            onDouble={onDouble}
+            onSplit={onSplit}
+          />
+        </motion.div>
       )}
 
       {state.phase === 'bj:player_turn' && !isMyTurn && (
-        <div className="text-gray-400 text-sm">
-          Warte auf {state.players.find((p) => p.id === state.currentPlayerId)?.displayName}...
-        </div>
+        <motion.div key="wait-player" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <div className="text-gray-400 text-sm">
+            Warte auf {state.players.find((p) => p.id === state.currentPlayerId)?.displayName}...
+          </div>
+        </motion.div>
       )}
 
       {state.phase === 'bj:payout' && (
-        <div className="text-casino-gold font-bold text-lg">Auszahlung...</div>
+        <motion.div
+          key="payout"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        >
+          <div className="text-casino-gold font-bold text-lg">Auszahlung...</div>
+        </motion.div>
       )}
+      </AnimatePresence>
 
       {/* Shoe info */}
       <div className="text-xs text-gray-500">

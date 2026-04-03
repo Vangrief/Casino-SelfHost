@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from 'framer-motion';
 import type { PokerClientState } from '@casino/shared';
 import { useAuthStore } from '../../stores/auth.store';
 import { CommunityCards } from './CommunityCards';
@@ -65,18 +66,26 @@ export function PokerTable({
         {/* Center: Community cards + pot */}
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 pointer-events-none">
           <CommunityCards cards={state.communityCards} phase={state.phase} />
-          {totalPot > 0 && (
-            <div className="bg-casino-bg/70 rounded-full px-4 py-1.5">
-              <span className="text-casino-gold font-bold text-sm">
-                Pot: {totalPot.toLocaleString()}
-              </span>
-              {state.pots.length > 1 && (
-                <span className="text-gray-400 text-xs ml-2">
-                  ({state.pots.length} Pots)
+          <AnimatePresence>
+            {totalPot > 0 && (
+              <motion.div
+                className="bg-casino-bg/70 rounded-full px-4 py-1.5"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              >
+                <span className="text-casino-gold font-bold text-sm">
+                  Pot: {totalPot.toLocaleString()}
                 </span>
-              )}
-            </div>
-          )}
+                {state.pots.length > 1 && (
+                  <span className="text-gray-400 text-xs ml-2">
+                    ({state.pots.length} Pots)
+                  </span>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Player seats */}
@@ -97,34 +106,67 @@ export function PokerTable({
       </div>
 
       {/* Actions */}
-      {isMyTurn && myPlayer && !myPlayer.isFolded && !myPlayer.isAllIn && (
-        <PokerActions
-          canCheck={canCheck}
-          canCall={canCall}
-          callAmount={callAmount}
-          minRaise={state.minRaise}
-          maxRaise={(myPlayer.chipCount || 0) + myCurrentBet}
-          onFold={onFold}
-          onCheck={onCheck}
-          onCall={onCall}
-          onRaise={onRaise}
-          onAllIn={onAllIn}
-        />
-      )}
+      <AnimatePresence mode="wait">
+        {isMyTurn && myPlayer && !myPlayer.isFolded && !myPlayer.isAllIn && (
+          <motion.div
+            key="poker-actions"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.25 }}
+          >
+            <PokerActions
+              canCheck={canCheck}
+              canCall={canCall}
+              callAmount={callAmount}
+              minRaise={state.minRaise}
+              maxRaise={(myPlayer.chipCount || 0) + myCurrentBet}
+              onFold={onFold}
+              onCheck={onCheck}
+              onCall={onCall}
+              onRaise={onRaise}
+              onAllIn={onAllIn}
+            />
+          </motion.div>
+        )}
 
-      {isMyTurn === false && state.phase !== 'poker:waiting' && state.phase !== 'poker:showdown' && (
-        <div className="text-gray-400 text-sm">
-          Warte auf {state.players.find((p) => p.id === state.currentPlayerId)?.displayName}...
-        </div>
-      )}
+        {isMyTurn === false && state.phase !== 'poker:waiting' && state.phase !== 'poker:showdown' && (
+          <motion.div
+            key="wait-player"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-gray-400 text-sm"
+          >
+            Warte auf {state.players.find((p) => p.id === state.currentPlayerId)?.displayName}...
+          </motion.div>
+        )}
 
-      {state.phase === 'poker:waiting' && (
-        <div className="text-gray-400 text-sm">Warte auf Spieler...</div>
-      )}
+        {state.phase === 'poker:waiting' && (
+          <motion.div
+            key="waiting"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-gray-400 text-sm"
+          >
+            Warte auf Spieler...
+          </motion.div>
+        )}
 
-      {state.phase === 'poker:showdown' && (
-        <div className="text-casino-gold font-bold text-lg">Showdown!</div>
-      )}
+        {state.phase === 'poker:showdown' && (
+          <motion.div
+            key="showdown"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            className="text-casino-gold font-bold text-lg"
+          >
+            Showdown!
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

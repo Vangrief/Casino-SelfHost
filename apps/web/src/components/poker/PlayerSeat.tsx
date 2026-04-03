@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from 'framer-motion';
 import type { PokerClientState } from '@casino/shared';
 import { PlayingCard } from '../blackjack/PlayingCard';
 
@@ -13,30 +14,40 @@ interface PlayerSeatProps {
 }
 
 export function PlayerSeat({ player, isMe, isCurrent, isDealer, position, timeRemaining }: PlayerSeatProps) {
-  const opacity = player.isFolded ? 'opacity-40' : 'opacity-100';
-
   return (
-    <div
-      className={`absolute flex flex-col items-center gap-1 transition-all ${opacity}`}
+    <motion.div
+      className="absolute flex flex-col items-center gap-1"
       style={{ left: position.x, top: position.y, transform: 'translate(-50%, -50%)' }}
+      animate={{ opacity: player.isFolded ? 0.4 : 1 }}
+      transition={{ duration: 0.3 }}
     >
       {/* Cards */}
       <div className="flex -space-x-4 mb-1">
-        {player.holeCards.map((card, i) => (
-          <PlayingCard key={i} card={card} className="!w-12 !h-[4.5rem] text-[0.6rem]" />
-        ))}
+        <AnimatePresence mode="popLayout">
+          {player.holeCards.map((card, i) => (
+            <PlayingCard
+              key={i}
+              card={card}
+              dealDelay={i}
+              animateDeal={true}
+              className="!w-12 !h-[4.5rem] text-[0.6rem]"
+            />
+          ))}
+        </AnimatePresence>
         {player.holeCards.length === 0 && !player.isFolded && (
           <div className="w-12 h-[4.5rem]" />
         )}
       </div>
 
       {/* Player info */}
-      <div
-        className={`rounded-xl px-3 py-1.5 text-center min-w-[7rem] border transition-all ${
+      <motion.div
+        className={`rounded-xl px-3 py-1.5 text-center min-w-[7rem] border transition-colors ${
           isCurrent
             ? 'bg-casino-gold/20 border-casino-gold shadow-lg shadow-casino-gold/20'
             : 'bg-casino-surface border-casino-border'
         }`}
+        animate={isCurrent ? { scale: [1, 1.03, 1] } : { scale: 1 }}
+        transition={isCurrent ? { duration: 1.5, repeat: Infinity, ease: 'easeInOut' } : {}}
       >
         <div className="flex items-center justify-center gap-1.5">
           {isDealer && (
@@ -53,35 +64,66 @@ export function PlayerSeat({ player, isMe, isCurrent, isDealer, position, timeRe
         </div>
 
         {/* Current bet */}
-        {player.currentBet > 0 && (
-          <div className="text-[0.6rem] text-gray-400 mt-0.5">
-            Bet: {player.currentBet.toLocaleString()}
-          </div>
-        )}
+        <AnimatePresence>
+          {player.currentBet > 0 && (
+            <motion.div
+              className="text-[0.6rem] text-gray-400 mt-0.5"
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+            >
+              Bet: {player.currentBet.toLocaleString()}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Status indicators */}
-        {player.isAllIn && (
-          <div className="text-[0.6rem] text-casino-red-light font-bold mt-0.5">ALL IN</div>
-        )}
-        {player.isFolded && (
-          <div className="text-[0.6rem] text-gray-500 mt-0.5">FOLD</div>
-        )}
-      </div>
+        <AnimatePresence>
+          {player.isAllIn && (
+            <motion.div
+              className="text-[0.6rem] text-casino-red-light font-bold mt-0.5"
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+            >
+              ALL IN
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
+          {player.isFolded && (
+            <motion.div
+              className="text-[0.6rem] text-gray-500 mt-0.5"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              FOLD
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
 
       {/* Timer */}
-      {isCurrent && timeRemaining !== null && (
-        <div className="mt-1">
-          <div className="bg-casino-bg rounded-full h-1.5 w-16 overflow-hidden">
-            <div
-              className={`h-full transition-all duration-1000 ${
-                timeRemaining < 10 ? 'bg-casino-red' : 'bg-casino-gold'
-              }`}
-              style={{ width: `${(timeRemaining / 30) * 100}%` }}
-            />
-          </div>
-          <span className="text-[0.6rem] text-gray-400">{timeRemaining}s</span>
-        </div>
-      )}
-    </div>
+      <AnimatePresence>
+        {isCurrent && timeRemaining !== null && (
+          <motion.div
+            className="mt-1"
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 5 }}
+          >
+            <div className="bg-casino-bg rounded-full h-1.5 w-16 overflow-hidden">
+              <div
+                className={`h-full transition-all duration-1000 ${
+                  timeRemaining < 10 ? 'bg-casino-red' : 'bg-casino-gold'
+                }`}
+                style={{ width: `${(timeRemaining / 30) * 100}%` }}
+              />
+            </div>
+            <span className="text-[0.6rem] text-gray-400">{timeRemaining}s</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
