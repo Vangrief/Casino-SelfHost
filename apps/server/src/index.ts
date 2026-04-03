@@ -10,6 +10,7 @@ import walletRoutes from './routes/wallet.js';
 import statsRoutes from './routes/stats.js';
 import lobbyRoutes from './routes/lobby.js';
 import { setupSocketIO } from './socket/index.js';
+import { runMigrations } from './db/migrate.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -42,6 +43,11 @@ app.use(errorHandler);
 setupSocketIO(httpServer);
 
 // Start server
-httpServer.listen(env.PORT, () => {
-  console.log(`Casino server running on port ${env.PORT}`);
-});
+async function start() {
+  await runMigrations();
+  httpServer.listen(env.PORT, () => {
+    console.log(`Casino server running on port ${env.PORT}`);
+  });
+}
+
+start();

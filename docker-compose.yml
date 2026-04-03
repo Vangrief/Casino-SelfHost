@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
     ports:
-      - "3000:3000"
+      - "3002:3000"
     depends_on:
       - casino-server
     restart: unless-stopped
@@ -21,7 +21,7 @@ services:
       DATABASE_URL: postgresql://casino:${DB_PASSWORD}@casino-db:5432/casino
       REDIS_URL: redis://casino-redis:6379
       JWT_SECRET: ${JWT_SECRET}
-      CORS_ORIGIN: http://localhost:3000
+      CORS_ORIGIN: http://localhost:3002
       NODE_ENV: production
       PORT: 3001
     depends_on:
