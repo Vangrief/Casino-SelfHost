@@ -1,4 +1,3 @@
-import { AnimatePresence } from 'framer-motion';
 import type { Card } from '@casino/shared';
 import { PlayingCard } from '../blackjack/PlayingCard';
 
@@ -22,17 +21,15 @@ export function CommunityCards({ cards, phase }: CommunityCardsProps) {
         {phaseLabels[phase] || ''}
       </span>
       <div className="flex gap-2 min-h-[6rem]">
-        <AnimatePresence mode="popLayout">
-          {[0, 1, 2, 3, 4].map((i) => (
-            <div key={i} className="w-16 h-24">
-              {cards[i] ? (
-                <PlayingCard card={cards[i]} dealDelay={i} animateDeal={true} />
-              ) : (
-                <div className="w-16 h-24 rounded-lg border-2 border-dashed border-casino-border/40" />
-              )}
-            </div>
-          ))}
-        </AnimatePresence>
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div key={i} className="w-16 h-24">
+            {cards[i] ? (
+              <PlayingCard card={cards[i]} dealDelay={i} animateDeal={true} />
+            ) : (
+              <div className="w-16 h-24 rounded-lg border-2 border-dashed border-casino-border/40" />
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );

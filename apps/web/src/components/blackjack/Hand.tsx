@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import type { BlackjackPlayerHand } from '@casino/shared';
 import { PlayingCard } from './PlayingCard';
 
@@ -10,22 +10,20 @@ interface HandProps {
 export function Hand({ hand, isActive = false }: HandProps) {
   return (
     <div className={`flex flex-col items-center gap-1 ${isActive ? 'ring-2 ring-casino-gold rounded-xl p-2' : 'p-2'}`}>
-      <div className="flex -space-x-6">
-        <AnimatePresence mode="popLayout">
-          {hand.cards.map((card, i) => {
-            const cardKey = 'hidden' in card
-              ? `hidden-${i}`
-              : `${(card as { rank: string; suit: string }).rank}-${(card as { rank: string; suit: string }).suit}-${i}`;
-            return (
-              <PlayingCard
-                key={cardKey}
-                card={card}
-                dealDelay={i}
-                animateDeal={true}
-              />
-            );
-          })}
-        </AnimatePresence>
+      <div className="relative" style={{ height: '6rem', width: `${Math.max(1, hand.cards.length) * 40 + 24}px` }}>
+        {hand.cards.map((card, i) => (
+          <div
+            key={i}
+            className="absolute top-0"
+            style={{ left: `${i * 40}px`, zIndex: i }}
+          >
+            <PlayingCard
+              card={card}
+              dealDelay={i}
+              animateDeal={true}
+            />
+          </div>
+        ))}
       </div>
       <motion.div
         className="flex items-center gap-2 mt-1"

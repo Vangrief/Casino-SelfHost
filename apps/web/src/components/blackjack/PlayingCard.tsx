@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import type { VisibleOrHiddenCard, Card } from '@casino/shared';
 
 const SUIT_SYMBOLS: Record<string, string> = {
@@ -28,7 +28,7 @@ interface PlayingCardProps {
 function CardBack({ className = '' }: { className?: string }) {
   return (
     <div
-      className={`w-16 h-24 rounded-lg bg-gradient-to-br from-blue-800 to-blue-950 border-2 border-blue-700 flex items-center justify-center shadow-lg backface-hidden ${className}`}
+      className={`w-16 h-24 rounded-lg bg-gradient-to-br from-blue-800 to-blue-950 border-2 border-blue-700 flex items-center justify-center shadow-lg ${className}`}
     >
       <div className="w-10 h-16 rounded border border-blue-600 bg-blue-900/50 flex items-center justify-center">
         <span className="text-blue-400 text-xl font-bold">?</span>
@@ -43,7 +43,7 @@ function CardFace({ card, className = '' }: { card: Card; className?: string }) 
 
   return (
     <div
-      className={`w-16 h-24 rounded-lg bg-white border border-gray-300 flex flex-col items-center justify-between p-1.5 shadow-lg backface-hidden ${className}`}
+      className={`w-16 h-24 rounded-lg bg-white border border-gray-300 flex flex-col items-center justify-between p-1.5 shadow-lg ${className}`}
     >
       <div className={`self-start text-xs font-bold leading-none ${color}`}>
         <div>{card.rank}</div>
@@ -78,20 +78,11 @@ export function PlayingCard({
     prevHiddenRef.current = isHidden;
   }, [isHidden]);
 
-  // Deal animation wrapper
-  const dealVariants = {
-    initial: animateDeal ? { y: -120, opacity: 0, scale: 0.7 } : {},
-    animate: {
-      y: 0,
-      opacity: 1,
-      scale: 1,
-      transition: {
-        type: 'spring' as const,
-        stiffness: 260,
-        damping: 20,
-        delay: dealDelay * 0.15,
-      },
-    },
+  const dealTransition = {
+    type: 'spring' as const,
+    stiffness: 260,
+    damping: 20,
+    delay: dealDelay * 0.15,
   };
 
   // Flip animation
@@ -100,9 +91,9 @@ export function PlayingCard({
       <motion.div
         className={`relative ${className}`}
         style={{ perspective: 600 }}
-        initial="initial"
-        animate="animate"
-        variants={dealVariants}
+        initial={animateDeal ? { y: -120, opacity: 0, scale: 0.7 } : undefined}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        transition={dealTransition}
       >
         <motion.div
           style={{ transformStyle: 'preserve-3d' }}
@@ -132,8 +123,9 @@ export function PlayingCard({
   return (
     <motion.div
       className={className}
-      initial={dealVariants.initial}
-      animate={dealVariants.animate}
+      initial={animateDeal ? { y: -120, opacity: 0, scale: 0.7 } : undefined}
+      animate={{ y: 0, opacity: 1, scale: 1 }}
+      transition={dealTransition}
     >
       {isHidden ? <CardBack /> : <CardFace card={card as Card} />}
     </motion.div>

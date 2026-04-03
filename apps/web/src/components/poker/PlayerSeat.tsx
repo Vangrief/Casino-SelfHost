@@ -22,21 +22,21 @@ export function PlayerSeat({ player, isMe, isCurrent, isDealer, position, timeRe
       transition={{ duration: 0.3 }}
     >
       {/* Cards */}
-      <div className="flex -space-x-4 mb-1">
-        <AnimatePresence mode="popLayout">
-          {player.holeCards.map((card, i) => (
+      <div className="relative mb-1" style={{ height: '4.5rem', width: player.holeCards.length > 0 ? `${player.holeCards.length * 32 + 16}px` : '3rem' }}>
+        {player.holeCards.map((card, i) => (
+          <div
+            key={i}
+            className="absolute top-0"
+            style={{ left: `${i * 32}px`, zIndex: i }}
+          >
             <PlayingCard
-              key={i}
               card={card}
               dealDelay={i}
               animateDeal={true}
               className="!w-12 !h-[4.5rem] text-[0.6rem]"
             />
-          ))}
-        </AnimatePresence>
-        {player.holeCards.length === 0 && !player.isFolded && (
-          <div className="w-12 h-[4.5rem]" />
-        )}
+          </div>
+        ))}
       </div>
 
       {/* Player info */}
