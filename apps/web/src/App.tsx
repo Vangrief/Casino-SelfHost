@@ -3,6 +3,7 @@ import { LoginPage } from './pages/Login';
 import { RegisterPage } from './pages/Register';
 import { LobbyPage } from './pages/Lobby';
 import { BlackjackGamePage } from './pages/BlackjackGame';
+import { PokerGamePage } from './pages/PokerGame';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { Layout } from './components/common/Layout';
 
@@ -27,6 +28,16 @@ export function App() {
           <ProtectedRoute>
             <Layout>
               <BlackjackGamePage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/poker/:tableId"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <PokerGamePage />
             </Layout>
           </ProtectedRoute>
         }

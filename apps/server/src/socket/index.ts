@@ -5,6 +5,7 @@ import { env } from '../config/env.js';
 import type { AuthPayload } from '../middleware/auth.js';
 import { setupLobbyNamespace } from './lobby.handler.js';
 import { setupBlackjackNamespace } from './blackjack.handler.js';
+import { setupPokerNamespace } from './poker.handler.js';
 
 export function setupSocketIO(httpServer: HttpServer): Server {
   const io = new Server(httpServer, {
@@ -33,10 +34,12 @@ export function setupSocketIO(httpServer: HttpServer): Server {
   // Apply auth to all namespaces
   io.of('/lobby').use(authMiddleware);
   io.of('/blackjack').use(authMiddleware);
+  io.of('/poker').use(authMiddleware);
 
   // Setup namespace handlers
   setupLobbyNamespace(io);
   setupBlackjackNamespace(io);
+  setupPokerNamespace(io);
 
   console.log('Socket.IO initialized');
   return io;

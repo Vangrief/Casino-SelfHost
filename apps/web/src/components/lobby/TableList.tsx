@@ -83,7 +83,10 @@ export function TableList({ tables }: TableListProps) {
                 <>
                   <button
                     onClick={() => {
-                      const route = table.gameType === 'blackjack' ? `/blackjack/${table.id}` : `/poker/${table.id}`;
+                      const buyIn = 'minBuyIn' in table.config ? table.config.minBuyIn : 5000;
+                      const route = table.gameType === 'blackjack'
+                        ? `/blackjack/${table.id}`
+                        : `/poker/${table.id}?buyIn=${buyIn}`;
                       navigate(route);
                     }}
                     className="px-4 py-2 rounded-lg text-sm font-medium bg-green-700 text-white hover:bg-green-600 transition-colors"
