@@ -1,5 +1,6 @@
 export * from './blackjack.js';
 export * from './poker.js';
+export * from './achievements.js';
 
 export const STARTING_CHIPS = 10000;
 export const JWT_EXPIRY = '7d';
