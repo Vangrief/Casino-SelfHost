@@ -12,8 +12,8 @@ const SUIT_SYMBOLS: Record<string, string> = {
 const SUIT_COLORS: Record<string, string> = {
   hearts: 'text-red-500',
   diamonds: 'text-red-500',
-  clubs: 'text-white',
-  spades: 'text-white',
+  clubs: 'text-gray-900',
+  spades: 'text-gray-900',
 };
 
 interface PlayingCardProps {
