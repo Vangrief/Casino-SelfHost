@@ -7,6 +7,7 @@ import { redis } from './config/redis.js';
 import { errorHandler } from './middleware/error-handler.js';
 import authRoutes from './routes/auth.js';
 import walletRoutes from './routes/wallet.js';
+import statsRoutes from './routes/stats.js';
 import { setupSocketIO } from './socket/index.js';
 
 const app = express();
@@ -19,6 +20,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/wallet', walletRoutes);
+app.use('/api/stats', statsRoutes);
 
 // Health check
 app.get('/api/health', async (_req, res) => {
