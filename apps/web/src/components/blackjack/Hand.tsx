@@ -12,15 +12,19 @@ export function Hand({ hand, isActive = false }: HandProps) {
     <div className={`flex flex-col items-center gap-1 ${isActive ? 'ring-2 ring-casino-gold rounded-xl p-2' : 'p-2'}`}>
       <div className="flex -space-x-6">
         <AnimatePresence mode="popLayout">
-          {hand.cards.map((card, i) => (
-            <PlayingCard
-              key={i}
-              card={card}
-              dealDelay={i}
-              animateDeal={true}
-              className={i > 0 ? 'relative' : ''}
-            />
-          ))}
+          {hand.cards.map((card, i) => {
+            const cardKey = 'hidden' in card
+              ? `hidden-${i}`
+              : `${(card as { rank: string; suit: string }).rank}-${(card as { rank: string; suit: string }).suit}-${i}`;
+            return (
+              <PlayingCard
+                key={cardKey}
+                card={card}
+                dealDelay={i}
+                animateDeal={true}
+              />
+            );
+          })}
         </AnimatePresence>
       </div>
       <motion.div

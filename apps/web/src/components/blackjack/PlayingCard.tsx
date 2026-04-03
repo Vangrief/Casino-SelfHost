@@ -134,7 +134,6 @@ export function PlayingCard({
       className={className}
       initial={dealVariants.initial}
       animate={dealVariants.animate}
-      layout
     >
       {isHidden ? <CardBack /> : <CardFace card={card as Card} />}
     </motion.div>
