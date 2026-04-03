@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  casino-web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - casino-server
+    restart: unless-stopped
+
+  casino-server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://casino:${DB_PASSWORD}@casino-db:5432/casino
+      REDIS_URL: redis://casino-redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGIN: http://localhost:3000
+      NODE_ENV: production
+      PORT: 3001
+    depends_on:
+      casino-db:
+        condition: service_healthy
+      casino-redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  casino-db:
+    image: postgres:16-alpine
+    volumes:
+      - casino-pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: casino
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: casino
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U casino"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  casino-redis:
+    image: redis:7-alpine
+    volumes:
+      - casino-redis-data:/data
+    command: redis-server --save 60 1 --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  casino-pgdata:
+  casino-redis-data:
