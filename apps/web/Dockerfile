@@ -13,12 +13,14 @@ RUN pnpm install --frozen-lockfile || pnpm install
 FROM deps AS build-shared
 COPY packages/shared/ packages/shared/
 COPY tsconfig.base.json ./
-RUN pnpm --filter @casino/shared build
+# Delete stale tsbuildinfo to force clean rebuild
+RUN find . -name "*.tsbuildinfo" -delete && pnpm --filter @casino/shared build
 
 # Build web
 FROM build-shared AS build
 COPY apps/web/ apps/web/
-RUN pnpm --filter @casino/web build
+# Delete stale tsbuildinfo to force clean rebuild
+RUN find . -name "*.tsbuildinfo" -delete && pnpm --filter @casino/web build
 
 # Serve with nginx
 FROM nginx:alpine AS production
