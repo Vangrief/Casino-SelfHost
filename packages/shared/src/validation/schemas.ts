@@ -16,7 +16,7 @@ export const loginSchema = z.object({
 // --- Lobby Events ---
 
 export const createTableSchema = z.object({
-  gameType: z.enum(['blackjack', 'poker']),
+  gameType: z.enum(['blackjack', 'poker', 'slots']),
   name: z.string().min(1).max(64),
   config: z.record(z.unknown()),
 });
@@ -47,6 +47,12 @@ export const bjInsuranceSchema = z.object({
 
 export const pokerRaiseSchema = z.object({
   amount: z.number().int().positive(),
+});
+
+// --- Slots Events ---
+
+export const slotsSpinSchema = z.object({
+  bet: z.number().int().positive(),
 });
 
 // --- Wallet ---

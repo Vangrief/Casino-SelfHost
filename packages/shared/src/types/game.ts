@@ -5,6 +5,7 @@ import type { Card, VisibleOrHiddenCard } from './card.js';
 export enum GameType {
   Blackjack = 'blackjack',
   Poker = 'poker',
+  Slots = 'slots',
 }
 
 export type BlackjackPhase = 'bj:betting' | 'bj:dealing' | 'bj:player_turn' | 'bj:dealer_turn' | 'bj:payout';
@@ -17,7 +18,9 @@ export type PokerPhase =
   | 'poker:river'
   | 'poker:showdown';
 
-export type GamePhase = BlackjackPhase | PokerPhase;
+export type SlotsPhase = 'slots:idle' | 'slots:spinning' | 'slots:result';
+
+export type GamePhase = BlackjackPhase | PokerPhase | SlotsPhase;
 
 export enum BlackjackAction {
   PlaceBet = 'place_bet',
@@ -125,7 +128,7 @@ export interface TableInfo {
   name: string;
   players: { id: string; username: string; displayName: string }[];
   maxPlayers: number;
-  config: BlackjackTableConfig | PokerTableConfig;
+  config: BlackjackTableConfig | PokerTableConfig | SlotsTableConfig;
   status: 'waiting' | 'playing';
   createdBy: string;
 }
@@ -148,4 +151,45 @@ export interface PokerTableConfig {
   maxPlayers: number;
   actionTimeout: number; // seconds
   blindIncreaseHands: number | null; // null = no increase
+}
+
+// --- Slots ---
+
+export type SlotSymbol =
+  | 'cherry'
+  | 'lemon'
+  | 'orange'
+  | 'plum'
+  | 'bell'
+  | 'bar'
+  | 'seven'
+  | 'diamond';
+
+export interface SlotReel {
+  symbols: SlotSymbol[];
+  stopped: SlotSymbol; // final symbol after spin
+}
+
+export interface SlotWinLine {
+  lineIndex: number;
+  symbols: SlotSymbol[];
+  positions: [number, number][]; // [reel, row]
+  multiplier: number;
+  payout: number;
+}
+
+export interface SlotsClientState {
+  phase: SlotsPhase;
+  reels: SlotSymbol[][]; // 5 reels × 3 visible rows
+  winLines: SlotWinLine[];
+  bet: number;
+  totalWin: number;
+  lastSpinId: string | null;
+}
+
+export interface SlotsTableConfig {
+  minBet: number;
+  maxBet: number;
+  reelCount: number;
+  rowCount: number;
 }

@@ -6,6 +6,7 @@ import type { AuthPayload } from '../middleware/auth.js';
 import { setupLobbyNamespace } from './lobby.handler.js';
 import { setupBlackjackNamespace } from './blackjack.handler.js';
 import { setupPokerNamespace } from './poker.handler.js';
+import { setupSlotsNamespace } from './slots.handler.js';
 
 export function setupSocketIO(httpServer: HttpServer): Server {
   const io = new Server(httpServer, {
@@ -35,11 +36,13 @@ export function setupSocketIO(httpServer: HttpServer): Server {
   io.of('/lobby').use(authMiddleware);
   io.of('/blackjack').use(authMiddleware);
   io.of('/poker').use(authMiddleware);
+  io.of('/slots').use(authMiddleware);
 
   // Setup namespace handlers
   setupLobbyNamespace(io);
   setupBlackjackNamespace(io);
   setupPokerNamespace(io);
+  setupSlotsNamespace(io);
 
   console.log('Socket.IO initialized');
   return io;

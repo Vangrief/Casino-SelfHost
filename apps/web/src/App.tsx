@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage } from './pages/Login';
 import { RegisterPage } from './pages/Register';
@@ -8,6 +9,8 @@ import { LeaderboardPage } from './pages/Leaderboard';
 import { ProfilePage } from './pages/Profile';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { Layout } from './components/common/Layout';
+
+const SlotsGame = lazy(() => import('./pages/SlotsGame'));
 
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -25,6 +28,7 @@ export function App() {
       <Route path="/" element={<ProtectedLayout><LobbyPage /></ProtectedLayout>} />
       <Route path="/blackjack/:tableId" element={<ProtectedLayout><BlackjackGamePage /></ProtectedLayout>} />
       <Route path="/poker/:tableId" element={<ProtectedLayout><PokerGamePage /></ProtectedLayout>} />
+      <Route path="/slots" element={<ProtectedLayout><Suspense fallback={<div className="text-center text-gray-400 mt-20">Lade...</div>}><SlotsGame /></Suspense></ProtectedLayout>} />
       <Route path="/leaderboard" element={<ProtectedLayout><LeaderboardPage /></ProtectedLayout>} />
       <Route path="/profile" element={<ProtectedLayout><ProfilePage /></ProtectedLayout>} />
       <Route path="*" element={<Navigate to="/" replace />} />

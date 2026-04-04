@@ -1,9 +1,9 @@
-import type { BlackjackClientState, BlackjackTableConfig, GameType, PokerClientState, PokerTableConfig, TableInfo } from './game.js';
+import type { BlackjackClientState, BlackjackTableConfig, GameType, PokerClientState, PokerTableConfig, SlotsClientState, SlotsTableConfig, TableInfo } from './game.js';
 
 // --- Client → Server Events ---
 
 export interface LobbyClientEvents {
-  'lobby:create_table': { gameType: GameType; name: string; config: BlackjackTableConfig | PokerTableConfig };
+  'lobby:create_table': { gameType: GameType; name: string; config: BlackjackTableConfig | PokerTableConfig | SlotsTableConfig };
   'lobby:join_table': { tableId: string };
   'lobby:leave_table': { tableId: string };
   'lobby:chat': { message: string };
@@ -26,6 +26,10 @@ export interface PokerClientEvents {
   'poker:all_in': Record<string, never>;
 }
 
+export interface SlotsClientEvents {
+  'slots:spin': { bet: number };
+}
+
 // --- Server → Client Events ---
 
 export interface LobbyServerEvents {
@@ -37,7 +41,7 @@ export interface LobbyServerEvents {
 }
 
 export interface GameServerEvents {
-  'game:state_update': BlackjackClientState | PokerClientState;
+  'game:state_update': BlackjackClientState | PokerClientState | SlotsClientState;
   'game:player_action': { playerId: string; action: string; data?: Record<string, unknown> };
   'game:phase_change': { newPhase: string };
   'game:hand_result': { winners: { playerId: string; amount: number }[]; payouts: { playerId: string; amount: number }[] };

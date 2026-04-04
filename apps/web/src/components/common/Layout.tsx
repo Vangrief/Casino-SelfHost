@@ -16,6 +16,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { path: '/', label: 'Lobby' },
+    { path: '/slots', label: 'Slots' },
     { path: '/leaderboard', label: 'Leaderboard' },
     { path: '/profile', label: 'Profil' },
   ];
