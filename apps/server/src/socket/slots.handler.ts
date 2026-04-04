@@ -3,6 +3,7 @@ import type { AuthPayload } from '../middleware/auth.js';
 import { SlotMachine } from '../games/slots/slot-machine.js';
 import { slotsSpinSchema } from '@casino/shared';
 import { debit, credit, getBalance } from '../services/wallet.service.js';
+import { AppError } from '../middleware/error-handler.js';
 
 // One slot machine instance per player (slots are single-player)
 const playerMachines = new Map<string, SlotMachine>();
@@ -21,7 +22,7 @@ export function setupSlotsNamespace(io: Server): void {
 
   nsp.on('connection', (socket) => {
     const user = socket.data.user as AuthPayload;
-    console.log(`[slots] ${user.username} connected`);
+    console.log(`[slots] ${user.username} (${user.id}) connected`);
 
     const machine = getMachine(user.id);
 
@@ -52,11 +53,17 @@ export function setupSlotsNamespace(io: Server): void {
       // Debit the bet from wallet
       try {
         await debit(user.id, bet, 'loss', 'slots', undefined, `Slots Einsatz: ${bet}`);
-      } catch {
-        socket.emit('game:error', {
-          code: 'INSUFFICIENT_FUNDS',
-          message: 'Nicht genug Chips',
-        });
+      } catch (err) {
+        console.error(`[slots] debit error for ${user.username} (bet=${bet}):`, err);
+
+        // Distinguish between insufficient funds and other errors
+        if (err instanceof AppError && err.statusCode === 400 && err.message.includes('Insufficient')) {
+          socket.emit('game:error', { code: 'INSUFFICIENT_FUNDS', message: 'Nicht genug Chips' });
+        } else if (err instanceof AppError && err.statusCode === 404) {
+          socket.emit('game:error', { code: 'WALLET_NOT_FOUND', message: 'Wallet nicht gefunden — bitte neu einloggen' });
+        } else {
+          socket.emit('game:error', { code: 'SERVER_ERROR', message: `Serverfehler beim Abbuchen: ${String(err)}` });
+        }
         return;
       }
 
@@ -100,12 +107,11 @@ export function setupSlotsNamespace(io: Server): void {
         setTimeout(() => {
           machine.setIdle();
         }, 3000);
-      }, 200); // small server-side delay, client handles visual spin
+      }, 200);
     });
 
     socket.on('disconnect', () => {
       console.log(`[slots] ${user.username} disconnected`);
-      // Keep machine state for reconnect
     });
   });
 }
